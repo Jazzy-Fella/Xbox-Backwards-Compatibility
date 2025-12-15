@@ -1,0 +1,5 @@
+{
+  "name": "Xbox Backwards Compatibility Checker",
+  "description": "A search tool for Xbox Series X/S users to check backwards compatibility and FPS Boost status for Xbox 360 and Original Xbox games.",
+  "requestFramePermissions": []
+}
