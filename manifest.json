@@ -8,12 +8,12 @@
   "orientation": "portrait",
   "icons": [
     {
-      "src": "https://placehold.co/192x192/107C10/ffffff.png?text=XB&font=roboto",
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f9/Xbox_one_logo.svg/192px-Xbox_one_logo.svg.png",
       "sizes": "192x192",
       "type": "image/png"
     },
     {
-      "src": "https://placehold.co/512x512/107C10/ffffff.png?text=XB&font=roboto",
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f9/Xbox_one_logo.svg/512px-Xbox_one_logo.svg.png",
       "sizes": "512x512",
       "type": "image/png"
     },

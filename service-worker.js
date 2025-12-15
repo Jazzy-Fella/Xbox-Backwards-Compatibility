@@ -1,4 +1,4 @@
-const CACHE_NAME = 'xbox-compat-v1';
+const CACHE_NAME = 'xbox-compat-v2';
 const ASSETS = [
   '/',
   '/index.html',
