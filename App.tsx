@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { Search, X, CheckCircle2, ChevronDown, LayoutGrid, List, Zap, ExternalLink } from 'lucide-react';
 import { getGames } from './services/gameData';
 import { Game, ConsolePlatform } from './types';
@@ -13,6 +13,8 @@ const App: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [activeFilter, setActiveFilter] = useState<FilterType>('ALL');
   const [viewMode, setViewMode] = useState<ViewMode>('GRID');
+  
+  const inputRef = useRef<HTMLInputElement>(null);
   
   // Pagination State
   const [visibleCount, setVisibleCount] = useState(12);
@@ -53,10 +55,12 @@ const App: React.FC = () => {
 
   // Reset pagination when search or view mode changes
   useEffect(() => {
+    // Performance Fix: Do NOT render 9999 items immediately.
+    // This causes massive lag on mobile due to the GameCard fetch logic.
+    // Limit initial search results to a reasonable number.
     if (searchTerm) {
-      setVisibleCount(9999); 
+      setVisibleCount(viewMode === 'LIST' ? 60 : 24); 
     } else {
-      // Show more items by default in list view to make it feel like a "full list"
       setVisibleCount(viewMode === 'LIST' ? 50 : 12);
     }
   }, [searchTerm, viewMode]);
@@ -65,7 +69,12 @@ const App: React.FC = () => {
     return filteredGames.slice(0, visibleCount);
   }, [filteredGames, visibleCount]);
 
-  const handleClear = () => setSearchTerm('');
+  const handleClear = (e: React.MouseEvent) => {
+    e.preventDefault(); // Prevent potential focus loss or double firing
+    setSearchTerm('');
+    // Refocus input to allow immediate re-typing
+    inputRef.current?.focus();
+  };
 
   const handleFilterClick = (type: FilterType) => {
     setActiveFilter(type);
@@ -115,21 +124,28 @@ const App: React.FC = () => {
 
           <div className="pt-2 md:pt-4 max-w-2xl mx-auto relative z-20 w-full">
             <div className="relative group">
-              <div className="absolute inset-y-0 left-0 pl-4 md:pl-5 flex items-center pointer-events-none">
+              {/* Separate Background Layer for better mobile performance/rendering */}
+              <div className="absolute inset-0 bg-white/80 backdrop-blur-xl border border-white/50 rounded-2xl shadow-xl shadow-green-900/5 transition-shadow duration-300 group-focus-within:ring-4 group-focus-within:ring-green-500/10 pointer-events-none" />
+              
+              <div className="absolute inset-y-0 left-0 pl-4 md:pl-5 flex items-center pointer-events-none z-10">
                 <Search className="h-5 w-5 md:h-6 md:w-6 text-gray-400 group-focus-within:text-xbox-green transition-colors" />
               </div>
+              
               <input
+                ref={inputRef}
                 type="text"
-                className="block w-full pl-11 md:pl-14 pr-10 md:pr-12 py-3 md:py-5 bg-white/80 backdrop-blur-xl border border-white/50 rounded-2xl text-base md:text-xl text-slate-800 placeholder-gray-400 focus:outline-none focus:ring-4 focus:ring-green-500/10 shadow-xl shadow-green-900/5 transition-all"
+                className="relative z-10 block w-full pl-11 md:pl-14 pr-10 md:pr-12 py-3 md:py-5 bg-transparent rounded-2xl text-base md:text-xl text-slate-800 placeholder-gray-400 focus:outline-none"
                 placeholder="Search library..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 autoFocus
               />
+              
               {searchTerm && (
                 <button 
+                    type="button"
                     onClick={handleClear}
-                    className="absolute inset-y-0 right-0 pr-4 md:pr-5 flex items-center text-gray-300 hover:text-gray-600 transition-colors"
+                    className="absolute z-10 inset-y-0 right-0 pr-4 md:pr-5 flex items-center text-gray-300 hover:text-gray-600 transition-colors cursor-pointer"
                 >
                     <X size={20} className="md:w-6 md:h-6" />
                 </button>
